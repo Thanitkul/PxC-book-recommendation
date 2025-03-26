@@ -1,5 +1,6 @@
 # clean_tags.py
 import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "4,5,6,7"
 import pandas as pd
 from vllm import LLM
 from vllm.sampling_params import SamplingParams
@@ -10,7 +11,7 @@ os.makedirs(INSIGHTS_DIR, exist_ok=True)
 
 def classify_tag_gemma(tag: str, llm: LLM) -> str:
     """
-    Uses the Gemma 3 model (via vLLM) to classify a tag as 1 (useful) or 0 (not useful).
+    Uses the Gemma 3 model to classify a tag as 1 (useful) or 0 (not useful).
     
     "1" => Tag is "useful" if it describes a book's genre or sub-genre (romance, sci-fi, etc.)
     "0" => Tag is "not useful" if it does NOT describe a genre (favorites, to-read, random, etc.).
@@ -64,8 +65,10 @@ def main():
 
     # 2) Initialize vLLM with the Gemma model
     llm = LLM(
-        model="local_models/google_gemma-3-27b-it",
-        generation_config="vllm"
+        model="google/gemma-3-27b-it",
+        generation_config="vllm",
+        tensor_parallel_size=4,
+        max_model_len=8192
     )
     print("Gemma 3 model loaded.")
 
