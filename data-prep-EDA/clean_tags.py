@@ -1,6 +1,5 @@
 # clean_tags.py
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "4,5,6,7"
 import pandas as pd
 from vllm import LLM
 from vllm.sampling_params import SamplingParams
@@ -12,38 +11,56 @@ os.makedirs(INSIGHTS_DIR, exist_ok=True)
 def classify_tag_gemma(tag: str, llm: LLM) -> str:
     """
     Uses the Gemma 3 model to classify a tag as 1 (useful) or 0 (not useful).
-    
+
     "1" => Tag is "useful" if it describes a book's genre or sub-genre (romance, sci-fi, etc.)
-    "0" => Tag is "not useful" if it does NOT describe a genre (favorites, to-read, random, etc.).
+    "0" => Tag is "not useful" if it does NOT describe a genre, is too specific (e.g. author/title references),
+           or if it's in a non-English language.
 
     Returns a single character, '1' or '0', as a string.
     """
     prompt = f"""
-You are an AI assistant helping with a book recommendation system. 
-We have a tag that people use to describe books, and we want to classify it as either
-"1" = useful or "0" = not useful, strictly returning a single digit "0" or "1".
+You are an AI assistant helping with a book recommendation system.
+We want to classify book tags as either:
+"1" = useful (describes a book's genre or sub-genre like romance, sci-fi, fantasy, mystery, etc.)
+"0" = not useful (general-purpose, unrelated, overly personal, or overly specific tags)
 
-We define "useful" if it describes a book's genre or sub-genre (like romance, sci-fi, fantasy, etc.). 
-"Not useful" are tags that do not describe a genre (like to-read, favourites, random personal labels, etc.).
+Strictly return a single character: either 0 or 1.
 
-Here are some examples:
+Rules:
+- Classify tags with **non-English characters** as 0.
+- Classify **overly specific tags** (e.g. ones that reference authors, book titles, or full series) as 0.
+- Classify **personal or meta tags** (like "to-read", "favorite", "read-multiple-times") as 0.
+
+Examples:
 
 Tag: "romance" -> 1
 Tag: "romance-bdsm" -> 1
-Tag: "teaching" -> 1
+Tag: "mystery" -> 1
+Tag: "sci-fi" -> 1
+Tag: "fantasy" -> 1
 Tag: "distopía" -> 1
-Tag: "distributed" -> 0
+Tag: "thriller" -> 1
+Tag: "teaching" -> 1
+
 Tag: "favourite" -> 0
+Tag: "to-read" -> 0
+Tag: "read-multiple-times" -> 0
 Tag: "--available-at-raspberrys--" -> 0
 Tag: "cb-bjb" -> 0
-Tag: "read-multiple-times" -> 0
+Tag: "Öykü" -> 0
+Tag: "まんが-ほか" -> 0
+Tag: "💖" -> 0
+Tag: "a-shade-of-vampire-series" -> 0
+Tag: "abduction-lisa-gardner-mystery-susp" -> 0
+Tag: "books-i-own" -> 0
+Tag: "trilogy-book-1" -> 0
+Tag: "dystopia-ya-series" -> 0
 
-Now, classify the following tag, returning only '0' or '1':
+Now, classify the following tag:
 
 Tag: "{tag}" -> 
 """.strip()
 
-    # Force short generation; we only want '0' or '1'.
     params = SamplingParams(
         temperature=0.2,
         max_tokens=2
@@ -51,12 +68,8 @@ Tag: "{tag}" ->
     outputs = llm.generate(prompt, params)
     response = outputs[0].outputs[0].text.strip()
 
-    # Basic parse: if '1' is in the response => "useful", else => "not useful"
-    # You can refine if you want to strictly check the first character, etc.
-    if "1" in response:
-        return "1"
-    else:
-        return "0"
+    return "1" if "1" in response else "0"
+
 
 def main():
     # 1) Load raw tags
@@ -68,7 +81,8 @@ def main():
         model="google/gemma-3-27b-it",
         generation_config="vllm",
         tensor_parallel_size=4,
-        max_model_len=8192
+        gpu_memory_utilization=0.90,
+        max_model_len=8192,
     )
     print("Gemma 3 model loaded.")
 
