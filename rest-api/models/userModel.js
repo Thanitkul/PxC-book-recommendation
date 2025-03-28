@@ -16,6 +16,7 @@ const getUserByUsername = async (username) => {
 
 // Create new user
 const createUser = async ({ username, hashedPassword, permission }) => {
+  
   const query = `
     INSERT INTO app.users (username, password, permission)
     VALUES ($1, $2, $3)
@@ -44,9 +45,47 @@ const getUserInfo = async (userId) => {
     return res.rows[0];
 }
 
+const getAllAdmins = async () => {
+    const query = `
+    SELECT id, username
+    FROM app.users
+    WHERE permission = 'admin'
+    `;
+
+    const res = await pool.query(query);
+
+    if (res.rows.length === 0) {
+        return null;
+    }
+
+    return res.rows;
+}
+
+const deleteUser = async (userId) => {
+    const query = `
+    DELETE FROM app.users
+    WHERE id = $1
+    `;
+
+    // TODO delete all user data from all tables
+
+    const res = await pool.query(query, [userId]);
+
+    if (res.rowCount === 0) {
+        return null;
+    }
+
+    return res.rowCount;
+}
+
+
 
 module.exports = {
     getUserByUsername,
     createUser,
-    getUserInfo
+    getUserInfo,
+    getAllAdmins,
+    deleteUser
 };
+
+

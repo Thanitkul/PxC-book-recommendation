@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { getUserByUsername, createUser, getUserInfo } = require("../models/userModel");
 const RouteProtection = require("../helpers/RouteProtection");
+const PasswordStrengthChecker = require("../helpers/passwordStrength");
+
 
 // POST /api/auth/signup
 // body = { STRING username, STRING password }
@@ -22,6 +24,10 @@ router.post("/signup", async (req, res) => {
         const existingUser = await getUserByUsername(normalizedUsername);
         if (existingUser) {
             return res.status(409).json({ message: "Username already exists" });
+        }
+
+        if (!PasswordStrengthChecker.check(normalizedPassword)) {
+            return res.status(400).json({ message: "Password is too weak" });
         }
 
         const salt = await bcrypt.genSalt(10);
