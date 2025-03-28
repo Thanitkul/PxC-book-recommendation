@@ -10,9 +10,11 @@ const app = express();
 
 // Load env vars
 dotenv.config();
-
 // Middleware stack
 const corsOptions = {
+  origin: (origin, callback) => {
+    callback(null, origin); // Reflect the request origin
+  },
   credentials: true
 };
 
