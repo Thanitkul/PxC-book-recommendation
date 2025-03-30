@@ -81,7 +81,7 @@ router.delete("/delete-rating", RouteProtection.verify, async (req, res) => {
 
 // POST /api/recommend/add-wishlist
 // request: { INT book_id }
-// response: { STRING message, INT book_id }
+// response: { STRING message, INT book_id, BOOLEAN wishlisted }
 router.post("/add-wishlist", RouteProtection.verify, async (req, res) => {
   const userId = req.user.userId;
   const { book_id } = req.body;

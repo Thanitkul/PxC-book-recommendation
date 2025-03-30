@@ -51,6 +51,19 @@ const getWishlist = async (userId) => {
     return res.rows;
 };
 
+const addToWishlist = async (userId, bookId) => {
+    const query = `
+        INSERT INTO app.to_read (user_id, book_id, created_at)
+        VALUES ($1, $2, CURRENT_TIMESTAMP)
+        ON CONFLICT (user_id, book_id)
+        DO NOTHING;
+    `;
+
+    await pool.query(query, [userId, bookId]);
+};
+
+
+
 const removeFromWishlist = async (userId, bookId) => {
     const query = `DELETE FROM app.to_read WHERE user_id = $1 AND book_id = $2`;
     await pool.query(query, [userId, bookId]);
@@ -62,5 +75,6 @@ module.exports = {
     updateRating,
     deleteRating,
     getWishlist,
+    addToWishlist,
     removeFromWishlist
 };
