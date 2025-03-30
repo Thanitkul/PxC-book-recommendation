@@ -4,12 +4,11 @@ const jwt = require("jsonwebtoken");
 class RouteProtection {
   static verify(req, res, next) {
     try {
-      console.log("Verifying token...");
-      console.log(req.headers);
-      const token = req.headers.cookie
-        .split("; ")
-        .find((row) => row.startsWith("token="))
-        .split("=")[1];
+      const token = req.headers.authorization.split(" ")[1];
+      if (!token) {
+        return res.status(401).json({ message: "Unauthorized" }).end();
+      }
+      // Verify the token
       const decoded = jwt.verify(token, process.env.TOKENSECRET);
       req.user = { userId: decoded.id, permission: decoded.permission };
       return next();

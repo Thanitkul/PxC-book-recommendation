@@ -28,8 +28,7 @@ const corsOptions = {
       console.log('Blocked by CORS. Origin:', origin);
       callback(new Error('Origin not allowed by CORS'));
     }
-  },
-  credentials: true
+  }
 };
 
 app.use(cors(corsOptions));
