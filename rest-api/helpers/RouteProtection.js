@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 class RouteProtection {
   static verify(req, res, next) {
     try {
+      console.log("Verifying token...");
+      console.log(req.headers);
       const token = req.headers.cookie
         .split("; ")
         .find((row) => row.startsWith("token="))

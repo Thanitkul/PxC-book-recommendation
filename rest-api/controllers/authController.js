@@ -43,7 +43,8 @@ router.post("/signup", async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: false, // Set to true if using HTTPS
+            secure: false, // Set to true in production
+            sameSite: 'none',
             maxAge: 24 * 60 * 60 * 1000 // 1 day in ms
         });
         res.status(200).json({ message: "Login successful" });
@@ -84,6 +85,7 @@ router.post("/signin", async (req, res) => {
         res.cookie("token", token, {
             httpOnly: true,
             secure: false, // Set to true in production
+            sameSite: 'none',
             maxAge: 24 * 60 * 60 * 1000 // 1 day in ms
         });
         res.status(200).json({ message: "Login successful" });
