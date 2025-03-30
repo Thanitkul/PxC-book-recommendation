@@ -44,7 +44,7 @@ router.post("/signup", async (req, res) => {
         res.cookie("token", token, {
             httpOnly: true,
             secure: false, // Set to true in production
-            sameSite: 'none',
+            sameSite: 'lax', // 'none' for cross-origin requests
             maxAge: 24 * 60 * 60 * 1000 // 1 day in ms
         });
         res.status(200).json({ message: "Login successful" });
@@ -85,7 +85,7 @@ router.post("/signin", async (req, res) => {
         res.cookie("token", token, {
             httpOnly: true,
             secure: false, // Set to true in production
-            sameSite: 'none',
+            sameSite: 'lax',
             maxAge: 24 * 60 * 60 * 1000 // 1 day in ms
         });
         res.status(200).json({ message: "Login successful" });
