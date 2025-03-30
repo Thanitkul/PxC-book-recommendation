@@ -16,6 +16,8 @@ function errorHandler(err, req, res, next) {
   //   return res.status(err.statusCode).json({ message: err.message });
   // }
 
+  console.error('Unhandled error:', err);
+
   // General or unknown error
   return res.status(500).json({ message: 'Internal server error' });
 }
