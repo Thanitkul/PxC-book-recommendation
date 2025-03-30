@@ -1,4 +1,4 @@
-psycopg2-binary
-python-dotenv
-bcrypt
-tqdm
+bcrypt==4.3.0
+psycopg2-binary==2.9.10
+python-dotenv==1.1.0
+tqdm==4.67.1
