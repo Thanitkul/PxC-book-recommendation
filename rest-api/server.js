@@ -1,9 +1,15 @@
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 const app = require("./app");
-const http = require("http");
+const https = require("https");
+
 const { testDbConnection } = require("./models/db.js");
 
-const server = http.createServer(app);
+// Load HTTPS credentials
+const privateKey = fs.readFileSync("./ssl/key.pem", "utf8");
+const certificate = fs.readFileSync("./ssl/cert.pem", "utf8");
+const credentials = { key: privateKey, cert: certificate };
+
+const server = https.createServer(credentials, app);
 
 async function startup() {
   try {
