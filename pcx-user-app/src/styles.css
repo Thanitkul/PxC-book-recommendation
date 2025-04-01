@@ -1,0 +1,61 @@
+/* You can add global styles to this file, and also import other style files */
+/* You can add global styles to this file, and also import other style files */
+@font-face {
+    font-family: 'sarabun-regular';
+    src: url('../src/assets/fonts/Sarabun-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'sarabun-light';
+    src: url('../src/assets/fonts/Sarabun-Light.ttf');
+}
+
+@font-face {
+    font-family: 'sarabun-extra-light';
+    src: url('../src/assets/fonts/Sarabun-ExtraLight.ttf');
+}
+
+@font-face {
+    font-family: 'sarabun-bold';
+    src: url('../src/assets/fonts/Sarabun-Bold.ttf');
+}
+
+@font-face {
+    font-family: 'sarabun-medium';
+    src: url('../src/assets/fonts/Sarabun-Medium.ttf');
+}
+
+@font-face {
+    font-family: 'sarabun-semibold';
+    src: url('../src/assets/fonts/Sarabun-SemiBold.ttf');
+}
+
+@font-face {
+    font-family: 'sarabun-extra-bold';
+    src: url('../src/assets/fonts/Sarabun-ExtraBold.ttf');
+}
+
+* {
+    font-family: 'sarabun-regular';
+    color: black;
+}
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+.modal {
+    /* add your styles */
+    background-color: transparent !important;
+    overflow: visible !important;
+}
+
+.mat-mdc-dialog-container .mdc-dialog__surface {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+}
+.cdk-overlay-dark-backdrop {
+    background: rgba(0, 0, 0, 0.5) !important;
+}
+body {
+    margin: 0 !important;
+}
+html, body { height: 100%; }
+body { margin: 0;}

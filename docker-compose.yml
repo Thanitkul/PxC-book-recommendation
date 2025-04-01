@@ -1,0 +1,62 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: PxC
+      POSTGRES_USER: PxCdev
+      POSTGRES_PASSWORD: PxCdev
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  dataloader:
+    build: ./dataloader
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: PxC
+      DB_USER: PxCdev
+      DB_PASSWORD: PxCdev
+    volumes:
+      - ./dataloader/data:/app/data
+    entrypoint: ["python", "dataloader.py"]
+
+  recsys:
+    build: ./recsys_server
+    depends_on:
+      - db
+    ports:
+      - "8081:8081"
+    environment:
+      HMAC_SECRET: 67cdf14bbcac4bb0d00382c0123025d3a6eeb8636f46e901f2169ef99f63910
+      DATABASE_URL: postgresql://PxCdev:PxCdev@db:5432/PxC
+
+  rest-api:
+    build: ./rest-api
+    depends_on:
+      dataloader:
+        condition: service_completed_successfully
+      - recsys
+    ports:
+      - "8443:8080"   # HTTPS
+      - "8080:8080"   # HTTP redirect (optional)
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: PxC
+      DB_USER: PxCdev
+      DB_PASSWORD: PxCdev
+      TOKENSECRET: 2LaJTJBci2CxCQ4maPYVleyew8coZIt89P4vF3zdvzc5q357eeJeftHDSxFMCHDK
+      RECSYS_URL: http://recsys:8081
+      RECSYS_HMAC_SECRET: 67cdf14bbcac4bb0d00382c0123025d3a6eeb8636f46e901f2169ef99f63910
+    volumes:
+      - ./rest-api/ssl:/usr/src/app/ssl
+
+volumes:
+  pgdata:

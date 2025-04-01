@@ -1,0 +1,91 @@
+.modal-container {
+    position: relative;
+    text-align: center;
+    width: 100%;
+    height: fit-content;
+    border-radius: 4vh;
+    background-color: #ffffff;
+    box-shadow: none;
+    padding: 4vh;
+}
+
+.header {
+    font-size: 3.5vh;
+    margin-bottom: 2vh;
+}
+
+.sub-header {
+    font-size: 2.5vh;
+    margin-bottom: 2vh;
+        color: #808080;
+}
+
+/* Responsive grid layout for genres */
+.genre-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0vh;
+    padding-top: 2vh;
+}
+
+/* Genre option item layout */
+.genre-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin: 3vh;
+}
+
+/* Outer circle */
+.option-big {
+    display: flex;
+    border-radius: 100%;
+    background-color: #737373;
+    align-items: center;
+    justify-content: center;
+    height: 53px;
+    width: 53px;
+}
+
+/* Inner circle (toggles selection) */
+.option-small {
+    display: flex;
+    border-radius: 100%;
+    background-color: #D9D9D9;
+    height: 38px;
+    width: 38px;
+    transition: background-color 0.2s ease;
+}
+
+/* Selected inner circle */
+.option-small.selected {
+    background-color: #ffffff;
+}
+
+/* Text beside option */
+.option-text {
+    margin-left: 10px;
+    font-size: 2.5vh;
+    width: 80px;
+    white-space: normal;
+    /* allow wrapping */
+    overflow: visible;
+    /* don't hide overflow */
+    text-overflow: unset;
+    /* don't use ellipsis */
+    text-align: left;
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 45vh;
+    height: 7vh;
+    border-radius: 2vh;
+    background-color: #C4C4C4;
+    margin-top: 3vh;
+    margin-left: auto;
+    margin-right: auto;
+    cursor: pointer;
+}

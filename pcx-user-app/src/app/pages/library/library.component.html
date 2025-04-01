@@ -1,0 +1,85 @@
+<div class="footer-top"></div>
+<div class="main-container">
+    <div style="width: 300px; margin-right: 40px;">
+        <div>
+            <img class="title" src="../../../assets/icons/pxc.svg">
+            <div class="sub-title" style="background-color: #D9D9D9;     cursor: pointer;"
+                (click)="navigateToRecommend()">
+                Recommend
+            </div>
+            <div class="sub-title" style="background-color: #737373; ">
+                Library
+            </div>
+            <div class="sub-title" style="background-color: #D9D9D9;" (click)="navigateToBrowse()">
+                Browse
+            </div>
+            <div class="sub-title" style="background-color: #D9D9D9;" (click)="navigateToSettings()">
+                Settings
+            </div>
+        </div>
+    </div>
+    <div
+        style="height: 75vh; width: 100%; border-radius: 15px; background-color: #C4C4C4; padding: 5vh; margin-right: 2vh; overflow: hidden; display: flex; flex-direction: column;">
+
+        <div class="settings">
+            <div style="margin-left: 1vh;">
+                <div style="display: flex; width: 350px;">
+                    <div class="tab" style="width: 60%;" (click)="changePage('rating')"
+                        [ngStyle]="{'background': (page === 'rating') ? '#737373' : ''}">
+                        Your Ratings
+                    </div>
+                    <div class="tab" style="width: 40%;" (click)="changePage('wishlist')"
+                        [ngStyle]="{'background': (page === 'wishlist') ? '#737373' : ''}">
+                        Wishlist
+                    </div>
+                </div>
+            </div>
+            <div class="search-container">
+                <div
+                    style="display: flex; align-items: center; justify-content: center; width: 15%; height: 100%; text-align: center;">
+                    <img src="../assets/icons/search.svg" class="search-icon" />
+                </div>
+                <div
+                    style="display: flex; width: 85%; vertical-align: middle; margin-top: auto; margin-bottom: auto; padding-left: 1vh;">
+                    <input type="text" class="form-control" [(ngModel)]="bookSearch" (input)="search()"
+                        placeholder="Search..." [ngModelOptions]="{standalone: true}">
+                </div>
+            </div>
+        </div>
+        <div *ngIf="page == 'rating'" class="book-container" style="width: 100%;">
+            <div class="book" *ngFor="let book of ratingList">
+                <div class="book">
+                    <div>
+                        <img class="book-image" [src]="book.image_url">
+                        <div class="book-title">{{book.title}}</div>
+                        <div class="book-author">{{book.author}}</div>
+                        <div class="rating">
+                            <img class="star"
+                                [src]="i <= book.rating ? '../../../assets/icons/star.svg' : '../../../assets/icons/no-star.svg'"
+                                (click)="rateBook(book.book_id, i)" *ngFor="let i of [1, 2, 3, 4, 5]" />
+                        </div>
+                        <div class="wishlist-button" style="background-color: #EB4436;" (click)="deleteRating(book.book_id)">
+                            <span style="font-family: 'sarabun-medium'; margin-right: 1px;">Clear Rate</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div *ngIf="page == 'wishlist'" class="book-container" style="width: 100%;">
+            <div class="book" *ngFor="let book of wishList">
+                <div class="book">
+                    <div>
+                        <img class="book-image" [src]="book.image_url">
+                        <div class="book-title">{{book.title}}</div>
+                        <div class="book-author">{{book.author}}</div>
+                        <div class="wishlist-button" (click)="removeFromWishlist(book.book_id)">
+                            <span style="font-family: 'sarabun-medium'; margin-right: 1px;">Wishlist</span>
+                            <img src="../../../assets/icons/cross.svg">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom"></div>

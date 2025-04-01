@@ -1,0 +1,42 @@
+/* You can add global styles to this file, and also import other style files */
+@font-face {
+    font-family: 'sarabun-regular';
+    src: url('../src/assets/fonts/Sarabun-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'sarabun-light';
+    src: url('../src/assets/fonts/Sarabun-Light.ttf');
+}
+
+@font-face {
+    font-family: 'sarabun-extra-light';
+    src: url('../src/assets/fonts/Sarabun-ExtraLight.ttf');
+}
+
+@font-face {
+    font-family: 'sarabun-bold';
+    src: url('../src/assets/fonts/Sarabun-Bold.ttf');
+}
+
+@font-face {
+    font-family: 'sarabun-medium';
+    src: url('../src/assets/fonts/Sarabun-Medium.ttf');
+}
+
+@font-face {
+    font-family: 'sarabun-semibold';
+    src: url('../src/assets/fonts/Sarabun-SemiBold.ttf');
+}
+
+@font-face {
+    font-family: 'sarabun-extra-bold';
+    src: url('../src/assets/fonts/Sarabun-ExtraBold.ttf');
+}
+
+* {
+    font-family: 'sarabun-regular';
+    color: black;
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

@@ -1,0 +1,28 @@
+<div class="footer-top"></div>
+<div class="main-container">
+    <div style="width: 300px; margin-right: 40px;">
+        <div>
+            <img class="title" src="../../../assets/icons/pxc.svg">
+            <div class="sub-title" style="background-color: #D9D9D9; cursor: pointer;" (click)="navigateToRecommend()">
+                Recommend
+            </div>
+            <div class="sub-title" style="background-color: #D9D9D9; cursor: pointer;" (click)="navigateToLibrary()">
+                Library
+            </div>
+            <div class="sub-title" style="background-color: #D9D9D9; cursor: pointer;" (click)="navigateToBrowse()">
+                Browse
+            </div>
+            <div class="sub-title" style="background-color: #737373; cursor: pointer;">
+                Settings
+            </div>
+        </div>
+    </div>
+    <div class="options-container" style="width: 100%;">
+        <div class="options-buttons">
+            <button class="option-button btn-blue" (click)="onExport()">Export Your Data</button>
+            <button class="option-button btn-red" (click)="onDelete()">Delete Account</button>
+            <button class="option-button btn-yellow" (click)="onLogout()">Log Out</button>
+        </div>
+
+    </div>
+    <div class="footer-bottom"></div>

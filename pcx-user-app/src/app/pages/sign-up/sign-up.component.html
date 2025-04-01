@@ -1,0 +1,61 @@
+<div class="footer-top"></div>
+
+<div class="screen">
+    <img src="../../../assets/icons/main-icon.svg" />
+
+    <div class="form-container">
+        <form (submit)="submitForm(); $event.preventDefault()">
+            <!-- Username -->
+            <div style="margin-bottom: 10px;">
+                <div for="username">Username:</div>
+                <input type="text" class="form-control" id="username" [(ngModel)]="signinForm.username"
+                    placeholder="Parnon" aria-describedby="username" [ngModelOptions]="{ standalone: true }"
+                    (input)="validateUsername()" [ngClass]="{ inputemptyWarning: warningUsernameMessage }" />
+                <p class="textemptyWarning" [ngClass]="{ warn: warningUsernameMessage }">
+                    {{ warningUsernameMessage }}
+                </p>
+            </div>
+
+            <!-- Password -->
+            <div style="margin-bottom: 10px;">
+                <div for="exampleInputPassword1">Password:</div>
+                <input type="password" class="form-control" id="exampleInputPassword1" [(ngModel)]="signinForm.password"
+                    placeholder="Hippo_007" [ngModelOptions]="{ standalone: true }" (input)="validatePassword()"
+                    [ngClass]="{ inputemptyWarning: warningPasswordMessage }" />
+                <div class="textemptyWarning" [ngClass]="{ warn: warningPasswordMessage }">
+                    {{ warningPasswordMessage }}
+                </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div style="margin-bottom: 10px;">
+                <div for="exampleInputPassword2">Confirm Password:</div>
+                <input type="password" class="form-control" id="exampleInputPassword2"
+                    [(ngModel)]="signinForm.confirmPassword" placeholder="Hippo_007"
+                    [ngModelOptions]="{ standalone: true }" (input)="validateConfirmPassword()"
+                    [ngClass]="{ inputemptyWarning: warningConfirmPasswordMessage }" />
+                <p class="textemptyWarning" [ngClass]="{ warn: warningConfirmPasswordMessage }">
+                    {{ warningConfirmPasswordMessage }}
+                </p>
+            </div>
+
+            <!-- Remember Me and Sign In -->
+            <div class="checkbox-container">
+                <div class="form-check" style="margin-bottom: 5px;">
+                    <label class="form-check-label"
+                        style="cursor: pointer; margin-left: 2vh; text-decoration: underline; color: #0067B4;"
+                        (click)="navigateToSignIn()">
+                        Sign In
+                    </label>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div style="text-align: center;">
+                <button type="submit" class="btn btn-primary">Sign Up</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="footer-bottom"></div>

@@ -1,0 +1,157 @@
+/* form style */
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 54vh;
+    height: 38vh;
+    margin-bottom: 2vh;
+}
+
+label {
+    font-size: 1.3vh;
+    font-weight: bold;
+}
+
+.screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.form-container {
+    width: max-content;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form-control {
+    padding: 0 5px 0 5px;
+}
+
+.checkbox-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    /* margin-top: 1vh; */
+}
+
+
+
+/* bootstrap form style override */
+.form-control {
+    width: 35vh;
+    height: 3.5vh;
+    border-radius: 0.5vh;
+    background-color: #EBEBEB;
+    border: none;
+}
+
+.form-check-input {
+    width: 1.5vh;
+    height: 1.5vh;
+    border-width: 0.16vh;
+    border-color: #000000;
+    border-radius: 0.4vh;
+    vertical-align: top;
+}
+
+.form-check-label {
+    font-family: 'sarabun-light';
+    line-height: 2;
+    vertical-align: top;
+}
+
+.btn {
+    width: 25vh;
+    height: 3vh;
+    border-radius: 0.5vh;
+    background-color: #0067B4;
+    border: none;
+    color: white;
+    font-weight: bold;
+    font-size: 1.3vh;
+    margin-bottom: 1.5vh;
+}
+
+/* footer style */
+.footer-top {
+    position: fixed;
+    height: 4vh;
+    width: 100%;
+    background-color: #C4C4C4;
+    top: 0;
+    left: 0;
+}
+
+.footer-bottom {
+    position: fixed;
+    height: 4vh;
+    width: 100%;
+    background-color: #C4C4C4;
+    bottom: 0;
+    left: 0;
+}
+
+
+
+/* placeholder style */
+::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: black;
+    opacity: 0.2;
+    /* Firefox */
+    font: 1.2vh 'sarabun';
+    vertical-align: middle;
+}
+
+:-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: black;
+    opacity: 0.2;
+    /* Firefox */
+    font: 1.2vh 'sarabun';
+}
+
+::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color: black;
+    opacity: 0.2;
+    /* Firefox */
+    font: 1.2vh 'sarabun';
+}
+
+
+
+.inputemptyWarning {
+    border-width: 0.1vh !important;
+    border: solid;
+    border-color: red;
+    justify-content: center;
+
+}
+
+
+.textemptyWarning {
+    color: red;
+    font-size: 1.2vh;
+    font-weight: 500;
+    padding-left: 0.5vh;
+    margin-top: 0.3vh;
+    visibility: hidden;
+    word-wrap: normal;
+    width: 35vh;
+}
+
+.warn {
+    visibility: visible !important;
+}
+
+.warn {
+    display: block !important;
+    
+}
+

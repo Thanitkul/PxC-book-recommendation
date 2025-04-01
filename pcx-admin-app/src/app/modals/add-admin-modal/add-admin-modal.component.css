@@ -1,0 +1,106 @@
+.modal-container {
+    position: relative;
+    width: 100%;
+    border-radius: 4vh;
+    background-color: #C4C4C4;
+    box-shadow: none;
+    padding-top: 8vh;
+}
+
+.header {
+    font-size: 3.5vh;
+    text-align: center;
+}
+
+.content {
+    background-color: #ffffff;
+    border-radius: 2vh;
+    padding: 2vh;
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 25vh;
+    height: 7vh;
+    border-radius: 1.5vh;
+    background-color: #26D01D;
+    margin-top: 3vh;
+    margin-left: auto;
+    margin-right: auto;
+    cursor: pointer;
+}
+
+.form-container {
+    width: max-content;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 6vh;
+}
+
+/* bootstrap form style override */
+.form-control {
+    width: 60vh;
+    height: 6vh;
+    border-radius: 0.5vh;
+    background-color: #EBEBEB;
+    border: none;
+    margin-bottom: 1vh;
+}
+
+
+.no-btn {
+    width: 15vh;
+    height: 6vh;
+    border-radius: 2vh;
+    border: none;
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+    font-size: 3vh;
+    margin-top: 2vh;
+    margin-bottom: 1.5vh;
+    margin-right: 2vh;
+}
+
+.yes-btn {
+    background-color: #90CF72 !important;
+    width: 15vh;
+    height: 6vh;
+    border-radius: 2vh;
+    border: none;
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+    font-size: 3vh;
+    margin-top: 2vh;
+    margin-bottom: 1.5vh;
+    margin-right: 2vh;
+}
+
+.buttons 
+{
+    display: flex;
+    margin-left: 15vh;
+}
+
+/* warning style  */
+.inputemptyWarning {
+    border-width: 0.1vh !important;
+    border: solid;
+    border-color: red;
+}
+
+.textemptyWarning {
+    color: red;
+    font-size: 1.2vh;
+    font-weight: 500;
+    display: none;
+    padding-left: 0.5vh;
+    margin-top: 0.3vh;
+
+}
+
+.warn {
+    display: block !important;
+}

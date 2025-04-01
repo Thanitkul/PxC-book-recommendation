@@ -1,0 +1,107 @@
+<div class="footer-top"></div>
+
+<div class="screen">
+    <!-- Left side with logo, title, logout button-->
+    <div class="left-side">
+        <img src="../../../assets/images/parnon-logo.svg" alt="Logo" class="logo-img" />
+        <div class="title-container">Admin</div>
+        <div class="logout-button" (click)="logout()">
+            Log Out
+            <img src="../../../assets/images/logout-icon.png" alt="Logout" class="logout-img">
+        </div>
+    </div>
+
+    <!-- Right side with main content -->
+    <div class="main-content-box">
+        <!-- Top bar -->
+        <div class="top-bar">
+            <div class="tabs">
+                <button class="tab" [class.active]="activeTab === 'book'" (click)="setTab('book')">Book</button>
+                <button class="tab" [class.active]="activeTab === 'user'" (click)="setTab('user')">User</button>
+            </div>
+
+            <div class="search-box">
+                <img src="assets/images/search-icon.png" alt="Search" class="search-icon">
+                <input type="text" placeholder="Search..." [(ngModel)]="searchQuery" (input)="onSearch()"
+                    [ngModelOptions]="{standalone: true}">
+            </div>
+        </div>
+
+        <!-- Table and Button Section -->
+        <div class="table-section">
+            <!-- Table Container -->
+            <div class="table-container">
+                <!-- Book Table -->
+                <table *ngIf="activeTab === 'book'">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Book title</th>
+                            <th>Author</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let book of filteredBooks" (click)="onBookRowClick(book)"
+                            [class.selected]="selectedBook === book">
+                            <td>{{ book.book_id }}</td>
+                            <td>{{ book.title }}</td>
+                            <td>{{ book.authors }}</td>
+                            <td *ngIf="book.is_visible === true ">Active</td>
+                            <td *ngIf="book.is_visible === false ">Hidden</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+                <!-- User Table -->
+                <table *ngIf="activeTab === 'user'">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Username</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let user of filteredUsers" (click)="onUserRowClick(user)"
+                            [class.selected]="selectedUser === user">
+                            <td>{{user.id}}</td>
+                            <td>{{user.username}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+
+            <!-- User Action Buttons (Only shown on User tab) -->
+            <div style="padding:0%; display:flex; align-items:end">
+                <div *ngIf="activeTab === 'user'" class="user-buttons">
+                    <div class="user-action-button delete-button" (click)="deleteUser()">
+                        Delete
+                    </div>
+                    <div class="user-action-button add-admin-button" (click)="addAdmin()">
+                        Add Admin
+                    </div>
+                </div>
+            </div>
+
+            <!-- Book Action Button (Only shown on Book tab) -->
+            <div style="padding:0%; display:flex; align-items:end">
+                <div *ngIf="activeTab === 'book'" class="book-toggle-button"
+                    [class.hide-button]="selectedBook && !isSelectedBookHidden"
+                    [class.show-button]="selectedBook && isSelectedBookHidden" (click)="toggleBookStatus()">
+                    <span class="button-content">
+                        <img *ngIf="selectedBook && !isSelectedBookHidden" src="assets/images/hide-button-icon.png"
+                            alt="Hide" class="button-icon">
+                        <img *ngIf="selectedBook && isSelectedBookHidden" src="assets/images/show-button-icon.png"
+                            alt="Show" class="button-icon">
+                        {{ selectedBook ? (isSelectedBookHidden ? 'Show' : 'Hide') : 'Show/Hide' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer-bottom"></div>

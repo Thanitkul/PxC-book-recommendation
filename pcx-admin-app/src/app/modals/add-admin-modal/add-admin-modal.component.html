@@ -1,0 +1,29 @@
+<div class="modal-container"
+    style="height: 50vh; display: flex; flex-direction: column; border-radius: 10px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.2);">
+    <div class="header">
+        Add admin
+    </div>
+
+    <div class="form-container">
+        <form>
+            <div style="margin-bottom: 10px;">
+                <div for="usernamelable">Username:</div>
+                <input type="text" class="form-control" id="username" [(ngModel)]="signinForm.username"
+                    placeholder="Example: Hallo" aria-describedby="username" required [ngModelOptions]="{standalone: true}"
+                     [ngClass]="{'inputemptyWarning': isUsernameEmtpy}">
+                <p [ngClass]="{'warn': isUsernameEmtpy}" class="textemptyWarning">{{warningUsernameMessage}}</p>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <div for="exampleInputPassword1">Password:</div>
+                <input type="password" class="form-control" [(ngModel)]="signinForm.password"
+                    placeholder="Example: $Hippo_007!" id="exampleInputPassword1" [ngModelOptions]="{standalone: true}"
+                      [ngClass]="{'inputemptyWarning': isPasswordEmtpy}">
+                <p class="textemptyWarning" [ngClass]="{'warn': isPasswordEmtpy}">{{warningPasswordMessage}}</p>
+            </div>
+            <div class="buttons">
+                <div style="text-align: center;"><button type="submit" (click)="addAdmin()" class="yes-btn btn-primary">Yes</button></div>
+                <div style="text-align: center;"><button type="submit" (click)="doneButtonFunction()" class="no-btn btn-primary">No!</button></div>
+            </div>
+        </form>
+    </div>
+</div>

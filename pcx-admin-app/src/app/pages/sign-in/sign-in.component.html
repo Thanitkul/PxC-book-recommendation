@@ -1,0 +1,24 @@
+<div class="footer-top"></div>
+<div class="screen"><img src="../../../assets/images/pxc-admin-logo.svg">
+    <div class="form-container">
+        <form>
+            <div style="margin-bottom: 10px;">
+                <div for="usernamelable">Username:</div>
+                <input type="text" class="form-control" id="username" [(ngModel)]="signinForm.username"
+                    placeholder="Example: Hallo" aria-describedby="username" required
+                    [ngModelOptions]="{standalone: true}" [ngClass]="{'inputemptyWarning': isUsernameEmtpy}">
+                <p [ngClass]="{'warn': isUsernameEmtpy}" class="textemptyWarning">{{warningUsernameMessage}}</p>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <div for="exampleInputPassword1">Password:</div>
+                <input type="password" class="form-control" [(ngModel)]="signinForm.password"
+                    placeholder="Example: $Hippo_007!" id="exampleInputPassword1" [ngModelOptions]="{standalone: true}"
+                    [ngClass]="{'inputemptyWarning': isPasswordEmtpy}">
+                <p class="textemptyWarning" [ngClass]="{'warn': isPasswordEmtpy}">{{warningPasswordMessage}}</p>
+            </div>
+            <div style="text-align: center;"><button type="submit" (click)="submitForm()" class="btn btn-primary">Sign
+                    in admin</button></div>
+        </form>
+    </div>
+</div>
+<div class="footer-bottom"></div>

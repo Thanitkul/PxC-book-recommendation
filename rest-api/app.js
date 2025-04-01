@@ -12,8 +12,8 @@ dotenv.config();
 
 // Create a list of allowed origins:
 const allowedOrigins = [
-  'http://192.168.1.130:4200',
-  'http://192.168.1.131:4200'
+  'https://192.168.1.130:4200',
+  'https://192.168.1.131:4200'
 ];
 
 const corsOptions = {

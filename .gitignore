@@ -1,0 +1,5 @@
+DLRM/cache
+DLRM/lightning_logs
+DLRM/item_cache.pt
+DLRM/rated_cache.pt
+DLRM/wishlist_cache.pt

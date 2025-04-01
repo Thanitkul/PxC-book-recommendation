@@ -1,0 +1,18 @@
+<div class="modal-container">
+    <div class="header">Which genres do you enjoy reading?</div>
+    <div class="sub-header">Tick one or more that apply</div>
+
+    <div class="genre-grid">
+        <div class="genre-option" *ngFor="let genre of genres" (click)="toggleGenre(genre)">
+            <div class="option-big">
+                <div class="option-small" *ngIf="selectedGenres.includes(genre)"></div>
+            </div>
+            <div class="option-text">{{ genre }}</div>
+        </div>
+    </div>
+
+    <div class="button" (click)="doneButtonFunction()">
+        <img style="height: 35px; width: 35px; margin-right: 1.5vh;" class="title" src="../../../assets/icons/check.svg">
+        <span style="font-size: 22px;">Done</span>
+    </div>
+</div>

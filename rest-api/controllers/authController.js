@@ -5,12 +5,13 @@ const jwt = require("jsonwebtoken");
 const { getUserByUsername, createUser, getUserInfo } = require("../models/userModel");
 const RouteProtection = require("../helpers/RouteProtection");
 const PasswordStrengthChecker = require("../helpers/passwordStrength");
+const { signinRateLimiter } = require("../helpers/rateLimiter");
 
 
 // POST /api/auth/signup
 // body = { STRING username, STRING password }
 // response = { STRING token }
-router.post("/signup", async (req, res) => {
+router.post("/signup", signinRateLimiter, async (req, res) => {
     try {
         const { username, password } = req.body;
 
@@ -53,7 +54,7 @@ router.post("/signup", async (req, res) => {
 // POST /api/auth/signin
 // body = { STRING username, STRING password }
 // response = { STRING token }
-router.post("/signin", async (req, res) => {
+router.post("/signin", signinRateLimiter, async (req, res) => {
     try {
         const { username, password } = req.body;
 

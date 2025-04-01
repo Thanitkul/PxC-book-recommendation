@@ -1,0 +1,83 @@
+<div class="footer-top"></div>
+<div class="main-container">
+    <div style="width: 300px; margin-right: 40px;">
+        <div>
+            <img class="title" src="../../../assets/icons/pxc.svg">
+            <div class="sub-title" style="background-color: #D9D9D9;" (click)="navigateToRecommend()">
+                Recommend
+            </div>
+            <div class="sub-title" style="background-color: #D9D9D9; cursor: pointer;" (click)="navigateToLibrary()">
+                Library
+            </div>
+            <div class="sub-title" style="background-color: #737373; cursor: pointer;">
+                Browse
+            </div>
+            <div class="sub-title" style="background-color: #D9D9D9; cursor: pointer;" (click)="navigateToSettings()">
+                Settings
+            </div>
+        </div>
+    </div>
+    <div
+        style="height: 75vh; width: 100%; border-radius: 15px; background-color: #C4C4C4; padding: 5vh; margin-right: 2vh; overflow: hidden; display: flex; flex-direction: column;">
+
+        <div class="search-sort-container">
+            <div class="search-container">
+                <div
+                    style="display: flex; align-items: center; justify-content: center; width: 15%; height: 100%; text-align: center;">
+                    <img src="../assets/icons/search.svg" class="search-icon" />
+                </div>
+                <div
+                    style="display: flex; width: 85%; vertical-align: middle; margin-top: auto; margin-bottom: auto; padding-left: 1vh;">
+                    <input type="text" class="form-control" [(ngModel)]="bookSearch" (input)="searchBook()"
+                        placeholder="Search..." [ngModelOptions]="{standalone: true}">
+                </div>
+            </div>
+
+            <div class="sort-container">
+                <span class="sort-label">Sort by:</span>
+                <div class="custom-select">
+                    <select class="sort-dropdown" [(ngModel)]="selectedSort" (change)="onSortChange($event)">
+                        <option value="" disabled selected hidden class="placeholder">Sort</option>
+                        <option value="az">A - Z</option>
+                        <option value="za">Z - A</option>
+                        <option value="popularity">Popularity</option>
+                        <option value="rating">Ratings</option>
+                    </select>
+                    <div class="dropdown-icon">
+                        <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1L6 6L11 1" stroke="#333" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="book-container" style="width: 100%;">
+            <!-- Use Angular slice pipe to display only the first displayCount books -->
+            <div class="book" *ngFor="let book of bookList | slice:0:displayCount">
+                <div class="book">
+                    <div>
+                        <img class="book-image" [src]="book.image">
+                        <div class="book-title">{{ book.title }}</div>
+                        <div class="book-author">{{ book.author }}</div>
+                        <div class="wishlist-button" (click)="addToWishlist(book.id)">
+                            <span style="font-family: 'sarabun-medium'; margin-right: 1px;">Wishlist</span>
+                            <img *ngIf="!book.wishList" src="../../../assets/icons/check.svg">
+                            <img *ngIf="book.wishList" src="../../../assets/icons/cross.svg">
+                        </div>
+                        <div class="rating">
+                            <img class="star"
+                                [src]="i <= book.stars ? '../../../assets/icons/star.svg' : '../../../assets/icons/no-star.svg'"
+                                (click)="rateBook(book.id, i)" *ngFor="let i of [1, 2, 3, 4, 5]" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Show More button if there are more books to display -->
+            <div *ngIf="displayCount < bookList.length" style="text-align: center; margin-top: 20px;">
+                <button (click)="showMoreBooks()">Show More</button>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom"></div>
+</div>
