@@ -30,23 +30,33 @@ services:
   recsys:
     build: ./recsys_server
     depends_on:
-      - db
+      dataloader:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
     ports:
       - "8081:8081"
     environment:
       HMAC_SECRET: 67cdf14bbcac4bb0d00382c0123025d3a6eeb8636f46e901f2169ef99f63910
       DATABASE_URL: postgresql://PxCdev:PxCdev@db:5432/PxC
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
 
   rest-api:
     build: ./rest-api
     depends_on:
       dataloader:
         condition: service_completed_successfully
-      - recsys
+      recsys:
+        condition: service_healthy
     ports:
-      - "8443:8080"   # HTTPS
-      - "8080:8080"   # HTTP redirect (optional)
+      - "8080:8080"  # redirect.js (HTTP)
+      - "8443:8443"  # server.js (HTTPS)
     environment:
+      PORT: 8443
       DB_HOST: db
       DB_PORT: 5432
       DB_NAME: PxC
@@ -58,5 +68,34 @@ services:
     volumes:
       - ./rest-api/ssl:/usr/src/app/ssl
 
+  pcx-admin-app:
+    build:
+      context: ./pcx-admin-app
+    depends_on:
+      - rest-api
+      - recsys
+      - db
+    ports:
+      - "4200:4200"
+    networks:
+      - frontend
+
+  pcx-user-app:
+    build:
+      context: ./pcx-user-app
+    depends_on:
+      - rest-api
+      - recsys
+      - db
+    ports:
+      - "4201:4201"
+    networks:
+      - frontend
+
+
+
 volumes:
   pgdata:
+
+networks:
+  frontend:

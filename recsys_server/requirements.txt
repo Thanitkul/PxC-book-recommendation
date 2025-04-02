@@ -5,4 +5,7 @@ python-dotenv
 pydantic
 orjson
 psycopg2-binary==2.9.9  # known good prebuilt wheel
-
+asyncio
+sentence-transformers
+pandas
+numpy

@@ -14,7 +14,7 @@ COPY . .
 # RUN chmod -R 755 /usr/src/app/ssl
 
 # Expose HTTPS port (this is the internal port your app listens on, 8080)
-EXPOSE 8080
+EXPOSE 8443
 
 # Start your app (HTTPS listener already in server.js)
 CMD ["node", "server.js"]
