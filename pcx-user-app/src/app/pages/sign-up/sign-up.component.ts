@@ -42,7 +42,8 @@ export class SignUpComponent {
     }
 
     isPasswordValid(password: string): boolean {
-        const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_. ,])[A-Za-z\d@$!%*?&_. ,]{6,}$/;
+        const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$%^&*()\-+=\/?"@$!%*?&_. ,])[A-Za-z\d#$%^&*()\-+=\/?"@$!%*?&_. ,]{6,}$/;
+
         return pattern.test(password);
     }
 

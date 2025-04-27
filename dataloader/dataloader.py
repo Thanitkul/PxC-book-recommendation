@@ -18,14 +18,49 @@ DB_NAME = os.getenv("DB_NAME", "postgres")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 
-def get_connection():
-    return psycopg2.connect(
-        host=DB_HOST,
-        port=DB_PORT,
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD
-    )
+import time
+
+def wait_for_db_ready(max_retries=15, delay=3):
+    for i in range(max_retries):
+        try:
+            conn = get_connection()
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT EXISTS (
+                        SELECT FROM information_schema.tables
+                        WHERE table_schema = 'app'
+                        AND table_name = 'books'
+                    );
+                """)
+                exists = cur.fetchone()[0]
+                if exists:
+                    print(f"✅ Schema and books table are ready (attempt {i+1})")
+                    conn.close()
+                    return
+                else:
+                    print(f"⏳ Table 'app.books' not found yet (attempt {i+1})")
+            conn.close()
+        except Exception as e:
+            print(f"⏳ DB not ready (attempt {i+1}) - {e}")
+        time.sleep(delay)
+    raise Exception("❌ Database schema 'app.books' not found after retries.")
+
+
+def get_connection(max_retries=10, delay=3):
+    for i in range(max_retries):
+        try:
+            return psycopg2.connect(
+                host=DB_HOST,
+                port=DB_PORT,
+                dbname=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
+            )
+        except psycopg2.OperationalError as e:
+            print(f"⏳ Waiting for DB... ({i+1}/{max_retries}) - {e}")
+            time.sleep(delay)
+    raise Exception("❌ Could not connect to the database after several attempts.")
+
 
 def truncate_tables(conn):
     with conn.cursor() as cur:
@@ -34,6 +69,17 @@ def truncate_tables(conn):
             RESTART IDENTITY CASCADE;
         """)
     conn.commit()
+
+def is_already_loaded(conn):
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables
+                WHERE table_schema = 'app'
+                AND table_name = 'books'
+            );
+        """)
+        return cur.fetchone()[0]
 
 # ========================================
 # 2. SQL Schema and Table Creation
@@ -175,7 +221,15 @@ def create_missing_users(conn, user_ids):
 # 4. Main Execution
 # ========================================
 def main():
+    #wait_for_db_ready()
+    print("✅ DB and schema ready.")
     conn = get_connection()
+    try:
+        if is_already_loaded(conn):
+            print("✅ Data already loaded. Skipping.")
+            return
+    except Exception as e:
+        print("❌ Error checking data load status:", e)
     try:
         create_tables(conn)
         truncate_tables(conn)
