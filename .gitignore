@@ -3,3 +3,7 @@ DLRM/lightning_logs
 DLRM/item_cache.pt
 DLRM/rated_cache.pt
 DLRM/wishlist_cache.pt
+DLRM/inference_outputs
+DLRM/inspection_outputs
+DLRM/data
+DLRM/trained_dlrm_goodreads.pt
