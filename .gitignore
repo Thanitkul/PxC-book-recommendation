@@ -7,3 +7,5 @@ DLRM/inference_outputs
 DLRM/inspection_outputs
 DLRM/data
 DLRM/trained_dlrm_goodreads.pt
+DLRM/trained_dlrm_goodreads_features.pt
+DLRM/logs
