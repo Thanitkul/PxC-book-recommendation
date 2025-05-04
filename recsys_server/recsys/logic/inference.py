@@ -3,6 +3,8 @@ import asyncio
 import psycopg2
 from config import DB_URL
 from recsys.logic import cold_start
+from recsys.logic.two_tower import recommend_two_tower
+from recsys.logic.collaborative import recommend_collaborative
 from recsys.data.feature_store import feature_store
 
 def get_user_activity_counts(user_id: int) -> Tuple[int, int]:
@@ -33,7 +35,7 @@ async def recommend_books(user_id: int) -> List[int]:
     
     - Users with fewer than 5 ratings OR fewer than 5 wishlist items use the cold‑start model.
     - Users with sufficient activity (>= 5 ratings and >= 5 wishlist items) receive combined results
-      from DLRM and collaborative models (placeholders for now).
+      from two-tower and collaborative models (placeholders for now).
     """
     ratings_count, wishlist_count = await get_user_activity_counts_async(user_id)
     if ratings_count < 5 or wishlist_count < 5:
@@ -55,10 +57,11 @@ async def recommend_books(user_id: int) -> List[int]:
             conn.close()
         return await cold_start_recommendation(user_id, user_genres)
     else:
-        dlrm_results = await dlrm_recommendation(user_id)
-        collab_results = await collaborative_recommendation(user_id)
+        two_tower_results = await asyncio.to_thread(recommend_two_tower, user_id)
+        collab_results = await asyncio.to_thread(recommend_collaborative, user_id)
         # Combine the results (here we concatenate and remove duplicates)
-        combined = list(dict.fromkeys(dlrm_results + collab_results))
+        # Total 100 books: 70 from two-tower, 30 from CF, exclude seen
+        combined = list(dict.fromkeys(two_tower_results + collab_results))[:100]
         return combined
 
 async def cold_start_recommendation(user_id: int, user_genres: Optional[str] = None) -> List[int]:
@@ -71,10 +74,3 @@ async def cold_start_recommendation(user_id: int, user_genres: Optional[str] = N
     recommended_books = cold_start.recommend_book_ids_by_genres(user_genres, top_n=10)
     return recommended_books
 
-async def dlrm_recommendation(user_id: int) -> List[int]:
-    # Placeholder for DLRM logic
-    return [6, 7, 8, 9, 10]
-
-async def collaborative_recommendation(user_id: int) -> List[int]:
-    # Placeholder for collaborative filtering logic
-    return [11, 12, 13, 14, 15]

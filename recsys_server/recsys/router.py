@@ -6,6 +6,10 @@ import json
 
 router = APIRouter()
 
+@router.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 @router.post("/recommend")
 async def recommend(request: Request):
     # Extract headers
