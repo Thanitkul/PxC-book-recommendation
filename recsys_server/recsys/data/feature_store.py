@@ -16,6 +16,7 @@ class FeatureStore:
         self.books_tagged = None         # DataFrame containing item metadata
         self.book_tag_embeddings = None    # Precomputed embeddings for each book
         self.model = None                  # SentenceTransformer model
+        self.tag_id_to_name = {}
 
     def load_data(self):
         """
@@ -33,10 +34,8 @@ class FeatureStore:
             raise RuntimeError("❌ Feature store: DB connection failed after retries.")
 
         print("✅ Feature store: DB connection established.")
-
         print("Loading books and tags...")
-        
-        # Query books (only visible ones)
+
         books_query = """
             SELECT book_id, title, authors, average_rating, ratings_count,
                    original_publication_year, language_code
@@ -44,16 +43,17 @@ class FeatureStore:
             WHERE is_visible = TRUE;
         """
         books_df = pd.read_sql(books_query, conn)
-        
-        # Retrieve book_tags and tags from the database
+
         book_tags_df = pd.read_sql("SELECT book_id, tag_id FROM app.book_tags;", conn)
         tags_df = pd.read_sql("SELECT tag_id, tag_name FROM app.tags;", conn)
-        
-        # Merge to get tag names for each book
+
+        # ADD THIS LINE: Store mapping as {tag_id: tag_name}
+        self.tag_id_to_name = dict(tags_df.values)
+
+        # Merge and preprocess
         book_tags_merged = pd.merge(book_tags_df, tags_df, on="tag_id", how="inner")
         books_with_tags = pd.merge(books_df, book_tags_merged, on="book_id", how="inner")
-        
-        # Group by book_id and concatenate unique tag names
+
         self.books_tagged = books_with_tags.groupby('book_id').agg({
             'title': 'first',
             'authors': 'first',
@@ -61,12 +61,12 @@ class FeatureStore:
             'language_code': 'first',
             'tag_name': lambda x: ' '.join(set(x))
         }).reset_index()
-        
-        # Create a text field (e.g. tag_text) to be embedded
+
         self.books_tagged['tag_text'] = self.books_tagged['tag_name']
 
         print("Feature store: Data loaded and preprocessed.")
         print(f"Number of books loaded: {len(self.books_tagged)}")
+
         conn.close()
 
     def load_model_and_compute_embeddings(self):

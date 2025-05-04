@@ -3,6 +3,7 @@ import asyncio
 import psycopg2
 from config import DB_URL
 from recsys.logic import cold_start
+from recsys.data.feature_store import feature_store
 
 def get_user_activity_counts(user_id: int) -> Tuple[int, int]:
     """
@@ -26,7 +27,7 @@ async def get_user_activity_counts_async(user_id: int) -> Tuple[int, int]:
     """
     return await asyncio.to_thread(get_user_activity_counts, user_id)
 
-async def recommend_books(user_id: int, user_genres: Optional[str] = None) -> List[int]:
+async def recommend_books(user_id: int) -> List[int]:
     """
     Dispatch recommendation requests based on user's activity.
     
@@ -36,6 +37,22 @@ async def recommend_books(user_id: int, user_genres: Optional[str] = None) -> Li
     """
     ratings_count, wishlist_count = await get_user_activity_counts_async(user_id)
     if ratings_count < 5 or wishlist_count < 5:
+        # query the database for user genres by query genre_ids INTEGER[] from app.users and map them to tag names in app.tags
+        conn = psycopg2.connect(DB_URL)
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT genre_ids FROM app.users WHERE id = %s", (user_id,))
+                result = cur.fetchone()
+                if result is None:
+                    return await cold_start_recommendation(user_id)
+                user_genres = result[0]
+
+                # Map genre_ids to tag names
+                user_genres = ' '.join([
+            feature_store.tag_id_to_name.get(tag_id, '') for tag_id in user_genres
+        ])
+        finally:
+            conn.close()
         return await cold_start_recommendation(user_id, user_genres)
     else:
         dlrm_results = await dlrm_recommendation(user_id)
