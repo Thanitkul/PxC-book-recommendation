@@ -12,10 +12,17 @@ services:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U PxCdev -d PxC"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   dataloader:
     build: ./dataloader
-    profiles: ["manual"]
+    depends_on:
+      db:
+        condition: service_healthy
     restart: "no"
     environment:
       DB_HOST: db
@@ -27,11 +34,11 @@ services:
       - ./dataloader/data:/app/data
     entrypoint: ["python", "dataloader.py"]
 
-
   recsys:
     build: ./recsys_server
     depends_on:
-      - db
+      dataloader:
+        condition: service_completed_successfully
     deploy:
       resources:
         reservations:
@@ -49,10 +56,9 @@ services:
     build: ./rest-api
     depends_on:
       - recsys
-      - db
     ports:
-      - "8080:8080"  # redirect.js (HTTP)
-      - "8443:8443"  # server.js (HTTPS)
+      - "8080:8080"
+      - "8443:8443"
     environment:
       PORT: 8080
       DB_HOST: db
@@ -71,8 +77,6 @@ services:
       context: ./pcx-admin-app
     depends_on:
       - rest-api
-      - recsys
-      - db
     ports:
       - "4200:4200"
     networks:
@@ -83,14 +87,10 @@ services:
       context: ./pcx-user-app
     depends_on:
       - rest-api
-      - recsys
-      - db
     ports:
       - "4201:4201"
     networks:
       - frontend
-
-
 
 volumes:
   pgdata:
