@@ -87,8 +87,11 @@ class FeatureStore:
         """
         Perform all initialization steps: load data and precompute embeddings.
         """
+        print("Initializing feature store...")
         self.load_data()
+        print("Feature store: Data loaded.")
         self.load_model_and_compute_embeddings()
+        print("Feature store: Model loaded and embeddings computed.")
 
 
 # Create a global instance of FeatureStore to be used by all recommendation models.

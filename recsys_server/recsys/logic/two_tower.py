@@ -12,6 +12,7 @@ from recsys.data.loader import (
 )
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {DEVICE}")
 CKPT_PATH = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "models", "two_tower_pointwise_bce_prefilter_80.pt")
 )
@@ -74,10 +75,15 @@ class TwoTower(nn.Module):
 # -----------------------------
 def init_two_tower_model():
     global _two_tower_model, _static
+
+    print("Loading TwoTower model...")
     _static = load_static_book_features()
+    print("Static features loaded.")
 
     ckpt = torch.load(CKPT_PATH, map_location=DEVICE)
     meta = ckpt.get("state_dict", ckpt)
+
+    print("Loading static features...")
 
     # Metadata or fallback values
     num_books   = int(_static["books"]["book_id"].max())
