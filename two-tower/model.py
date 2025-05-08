@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 
 # ─── CONFIG ─────────────────────────────────────────────────────────
 DATA_ROOT      = "../data-prep-EDA/clean"
-MODEL_SAVE     = "two_tower_pointwise_bce_prefilter_80.pt"
+MODEL_SAVE     = "two_tower_pointwise_bce.pt"
 LOSS_CURVE     = "loss_curve.png"
 EVAL_CURVE     = "eval_ndcg_curve.png"
 
@@ -36,7 +36,7 @@ EMBED_DIM      = 128
 DENSE_HID      = 64
 USER_HID       = [512, 256, 128, 64]
 BATCH_SIZE     = 2048
-EPOCHS         = 10
+EPOCHS         = 50
 LR             = 3e-4
 SEED           = 42
 PAD            = 0        # padding book_id
@@ -313,19 +313,6 @@ for ep in range(1, EPOCHS+1):
     loss_history.append(avg_loss)
     print(f">>> Epoch {ep}: Train BCE Loss = {avg_loss:.4f}")
 
-    # overwrite checkpoint
-    torch.save({
-        "state_dict":   model.state_dict(),
-        "num_books":    int(books.book_id.max()),
-        "num_authors":  max(author2idx.values()),
-        "num_langs":    max(lang2idx.values()),
-        "num_tags":     NUM_TAGS,
-        "embed_dim":    EMBED_DIM,
-        "user_hids":    USER_HID,
-        "max_hist_len": MAX_HIST_LEN,
-        "max_wish_len": MAX_WISH_LEN,
-    }, MODEL_SAVE)
-
     # — eval nDCG@TOP_N —
     ndcg_vals = []
     for uid in tqdm(eval_users, desc=f"Epoch {ep} Eval"):
@@ -338,8 +325,23 @@ for ep in range(1, EPOCHS+1):
         ndcg_vals.append(dcg/IDCG)
 
     avg_ndcg = float(np.mean(ndcg_vals))
+    if ep == 1 or avg_ndcg > max(eval_ndcg_history):
+        # overwrite checkpoint
+        torch.save({
+            "state_dict":   model.state_dict(),
+            "num_books":    int(books.book_id.max()),
+            "num_authors":  max(author2idx.values()),
+            "num_langs":    max(lang2idx.values()),
+            "num_tags":     NUM_TAGS,
+            "embed_dim":    EMBED_DIM,
+            "user_hids":    USER_HID,
+            "max_hist_len": MAX_HIST_LEN,
+            "max_wish_len": MAX_WISH_LEN,
+        }, MODEL_SAVE)
+        print("→ Saved model checkpoint.")
     eval_ndcg_history.append(avg_ndcg)
     print(f"▶︎ Epoch {ep}: Eval nDCG@{TOP_N} = {avg_ndcg:.4f}")
+    
 
 # ─── 8) PLOT ────────────────────────────────────────────────────────
 plt.figure()
