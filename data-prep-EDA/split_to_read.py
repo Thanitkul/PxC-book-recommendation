@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-split_to_read.py
+split_to_read_balanced.py      (ᓚᘏᗢ)
 
-•  Tag-aware pre-filter: cap each tag’s frequency at the 80-th percentile
-   of its global occurrence across wish-lists (using the top-5 tags per book).
-•  Users with ≤ MIN_WISH_COUNT remaining items are dropped from consideration.
-•  A fixed fraction TEST_FRAC of *all* remaining users is sampled
-   for the test split (provided there are enough eligible users).
+•  Book-aware pre-filter: cap how often every **book_id** may appear
+   at the P_BOOK-th percentile of its original wishlist frequency.
+•  Users with ≤ MIN_WISH_COUNT remaining items are dropped.
+•  A fixed TEST_FRAC of all remaining users is sampled for the test split.
+•  Prints detailed stats and saves a before/after book-count plot.
 """
 
 import os
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict
 
 import numpy as np
 import pandas as pd
@@ -19,93 +19,82 @@ import matplotlib.pyplot as plt
 
 # ─── CONFIG ─────────────────────────────────────────────────────────
 DATA_DIR        = "clean"
-WISHLIST_CSV    = os.path.join(DATA_DIR, "to_read.csv")
-BOOK_TAGS_CSV   = os.path.join(DATA_DIR, "book_tags.csv")
+WISHLIST_CSV    = os.path.join(DATA_DIR, "to_read.csv")   # user_id, book_id
 
 TRAIN_OUT       = os.path.join(DATA_DIR, "to_read_train.csv")
 TEST_OUT        = os.path.join(DATA_DIR, "to_read_test.csv")
 DIST_PLOT_OUT   = os.path.join(DATA_DIR, "wishlist_distribution.png")
+BOOK_PLOT_OUT   = os.path.join(DATA_DIR, "book_count_before_after.png")
 
+P_BOOK          = 80        # percentile for book-cap
 TEST_FRAC       = 0.10      # wanted fraction of all users → test
 MIN_WISH_COUNT  = 11        # user needs > this after filtering
 
-RNG_SEED        = 42        # reproducibility
+RNG_SEED        = 42
 np.random.seed(RNG_SEED)
 
 # ─── 1) LOAD DATA ──────────────────────────────────────────────────
-wl_df      = pd.read_csv(WISHLIST_CSV)          # columns: user_id, book_id
-book_tags  = pd.read_csv(BOOK_TAGS_CSV)         # columns: book_id, tag_id, count
+wl_df = pd.read_csv(WISHLIST_CSV)               # columns: user_id, book_id
 
-# ─── 2) BUILD top-5 TAG LIST PER BOOK ──────────────────────────────
-top_tags: Dict[int, List[int]] = {}
-for bid, grp in book_tags.groupby("book_id"):
-    tag_list = grp.sort_values("count", ascending=False).tag_id.tolist()
-    top_tags[bid] = (tag_list + [0]*5)[:5]
+# ─── 2) GLOBAL BOOK STATISTICS & CAP ───────────────────────────────
+book_counts_all = wl_df.book_id.value_counts().sort_index()
+book_cap = int(np.percentile(book_counts_all.values, P_BOOK))
+print(f"Book-cap ({P_BOOK}-th pct): {book_cap:>6} "
+      f"(min={book_counts_all.min()}, max={book_counts_all.max()})")
 
-# ─── 3) GLOBAL TAG COUNTS & CAP AT 80-th PERCENTILE ────────────────
-tag_counts = defaultdict(int)
-for b in wl_df.book_id:
-    for t in top_tags.get(b, []):
-        if t:                                   # ignore padding 0
-            tag_counts[t] += 1
-
-all_tag_freqs = np.array(list(tag_counts.values()))
-tag_cap = int(np.percentile(all_tag_freqs, 90))
-print(f"Tag-cap (80-th percentile) = {tag_cap}")
-
-# ─── 4) PREFILTER WISHLISTS WITH TAG CAP ───────────────────────────
-# shuffle users once to avoid bias
-users_shuffled = wl_df.user_id.unique()
+# ─── 3) PREFILTER WISHLISTS WITH BOOK CAP ─────────────────────────
+users_shuffled  = wl_df.user_id.unique()
 np.random.shuffle(users_shuffled)
 
-tag_run_count  = defaultdict(int)               # running totals after filtering
-kept_records   = []                             # tuples (user_id, book_id)
+book_run_count: Dict[int, int] = defaultdict(int)
+kept_records = []                                 # (user_id, book_id)
 
 for u in users_shuffled:
-    books = wl_df.loc[wl_df.user_id == u, "book_id"].tolist()
-    for b in books:
-        tags = [t for t in top_tags.get(b, []) if t]
-        if any(tag_run_count[t] >= tag_cap for t in tags):
-            # at least one tag is already saturated – skip this book
-            continue
+    for b in wl_df.loc[wl_df.user_id == u, "book_id"]:
+        if book_run_count[b] >= book_cap:
+            continue                              # saturated book
         kept_records.append((u, b))
-        for t in tags:
-            tag_run_count[t] += 1
+        book_run_count[b] += 1
 
-pref_df = pd.DataFrame(kept_records, columns=["user_id", "book_id"])
-print(f"After pre-filter: {len(pref_df)} wishlist entries, "
-      f"{pref_df.user_id.nunique()} users")
+pref_df = pd.DataFrame(kept_records,
+                       columns=["user_id", "book_id"])
+print(f"After pre-filter : {len(pref_df):>7} wishlist rows, "
+      f"{pref_df.user_id.nunique():>5} users")
 
-# ─── 5) FILTER USERS BY MIN_WISH_COUNT ─────────────────────────────
-user_sizes = pref_df.groupby("user_id").size()
-eligible_users = user_sizes[user_sizes > MIN_WISH_COUNT].index
+# Book stats *after* cap
+book_counts_after = pref_df.book_id.value_counts().sort_index()
+print(f"Book counts after: min={book_counts_after.min()}, "
+      f"max={book_counts_after.max()}")
+
+# ─── 4) FILTER USERS BY MIN_WISH_COUNT ─────────────────────────────
+user_sizes      = pref_df.groupby("user_id").size()
+eligible_users  = user_sizes[user_sizes > MIN_WISH_COUNT].index
 print(f"Eligible users (> {MIN_WISH_COUNT} items) = {len(eligible_users)}")
 
-# ─── 6) SAMPLE TEST USERS (TEST_FRAC OF ALL USERS) ─────────────────
-all_users      = pref_df.user_id.unique()
-test_size_goal = int(len(all_users) * TEST_FRAC)
+# ─── 5) SAMPLE TEST USERS (TEST_FRAC OF ALL USERS) ─────────────────
+all_users       = pref_df.user_id.unique()
+test_size_goal  = int(len(all_users) * TEST_FRAC)
+
 if test_size_goal > len(eligible_users):
-    print("⚠️  Not enough eligible users to meet desired test fraction – "
-          "using all eligible users as test.")
+    print("⚠️  Not enough eligible users – using all eligible users for test")
     test_users = np.array(eligible_users)
 else:
     test_users = np.random.choice(eligible_users,
                                   size=test_size_goal,
                                   replace=False)
 
-train_users = np.setdiff1d(all_users, test_users)   # remaining users
+train_users = np.setdiff1d(all_users, test_users)
+train_df    = pref_df[pref_df.user_id.isin(train_users)]
+test_df     = pref_df[pref_df.user_id.isin(test_users)]
 
-train_df = pref_df[pref_df.user_id.isin(train_users)]
-test_df  = pref_df[pref_df.user_id.isin(test_users)]
-
-# ─── 7) SAVE SPLITS ────────────────────────────────────────────────
+# ─── 6) SAVE SPLITS ────────────────────────────────────────────────
 train_df.to_csv(TRAIN_OUT, index=False)
 test_df.to_csv(TEST_OUT,  index=False)
-print(f"Saved {len(train_df)} train rows → {TRAIN_OUT}")
-print(f"Saved {len(test_df)}  test rows  → {TEST_OUT}")
+print(f"Saved {len(train_df):>7} train rows → {TRAIN_OUT}")
+print(f"Saved {len(test_df):>7}  test rows → {TEST_OUT}")
 
-# ─── 8) SUMMARY STATS ──────────────────────────────────────────────
-def summary(name, df_):
+# ─── 7) SUMMARY STATS ──────────────────────────────────────────────
+def summary(name: str, df_: pd.DataFrame) -> None:
     sizes = df_.groupby("user_id").size()
     print(f"\n{name} summary")
     print(f"  users          : {df_.user_id.nunique()}")
@@ -116,10 +105,11 @@ def summary(name, df_):
 summary("TRAIN", train_df)
 summary("TEST ", test_df)
 
-# ─── 9) PLOT DISTRIBUTION ──────────────────────────────────────────
-plt.figure(figsize=(10,6))
-bins = range(1, max(train_df.groupby("user_id").size().max(),
-                    test_df.groupby("user_id").size().max()) + 2)
+# ─── 8) PLOT USER-SIZE DISTRIBUTION (TRAIN vs TEST) ────────────────
+plt.figure(figsize=(10, 6))
+bins = range(1,
+             max(train_df.groupby("user_id").size().max(),
+                 test_df.groupby("user_id").size().max()) + 2)
 plt.hist(train_df.groupby("user_id").size(), bins=bins,
          alpha=0.6, label="Train")
 plt.hist(test_df.groupby("user_id").size(), bins=bins,
@@ -131,5 +121,22 @@ plt.legend()
 plt.xticks(bins)
 plt.tight_layout()
 plt.savefig(DIST_PLOT_OUT)
-plt.show()
-print(f"Distribution plot saved → {DIST_PLOT_OUT}")
+plt.close()
+print(f"User-size distribution plot saved → {DIST_PLOT_OUT}")
+
+# ─── 9) PLOT BOOK-COUNT BEFORE vs AFTER ────────────────────────────
+plt.figure(figsize=(12, 6))
+book_ids_sorted = book_counts_all.index
+plt.bar(book_ids_sorted, book_counts_all.values,
+        alpha=0.5, label="Before cap")
+plt.bar(book_ids_sorted,
+        book_counts_after.reindex(book_ids_sorted).fillna(0).values,
+        alpha=0.5, label="After cap", color="red")
+plt.xlabel("Book ID")
+plt.ylabel("Times wish-listed")
+plt.title("Book-frequency distribution (before vs after cap)")
+plt.legend()
+plt.tight_layout()
+plt.savefig(BOOK_PLOT_OUT)
+plt.close()
+print(f"Book-count plot saved          → {BOOK_PLOT_OUT}")

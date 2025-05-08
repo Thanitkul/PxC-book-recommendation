@@ -14,7 +14,7 @@ from recsys.data.loader import (
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {DEVICE}")
 CKPT_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "models", "two_tower_pointwise_bce_prefilter_80.pt")
+    os.path.join(os.path.dirname(__file__), "..", "models", "two_tower_pointwise_bce.pt")
 )
 PAD = 0
 BATCH_SIZE = 8192
