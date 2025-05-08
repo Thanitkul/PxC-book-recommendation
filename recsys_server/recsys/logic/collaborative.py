@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import sparse
 from sklearn.neighbors import NearestNeighbors
-from recsys.data.loader import get_ratings_matrix
+from recsys.data.loader import get_ratings_matrix, get_user_history
 import pandas as pd
 
 
@@ -34,6 +34,45 @@ class UserBasedCFOptimized:
 
     def recommend(self, user_id: int, top_n: int = 10) -> list[int]:
         u = user_id - 1
+
+        if u < 0 or u >= self.Rd.shape[0]:
+            # New user not in similarity matrix — soft integration
+
+            rated_books, _ = get_user_history(user_id)
+
+            if not rated_books:
+                # Completely cold user → fallback to popularity
+                pop = self.R_csr.sum(0).A1
+                idx = np.argsort(pop)[::-1][:top_n]
+                return (idx + 1).tolist()
+
+            # Step 1: Create temporary rating vector
+            u_vec = np.zeros(self.n_items)
+            for book_id, rating in rated_books:
+                if 0 < book_id <= self.n_items:
+                    u_vec[book_id - 1] = rating
+
+            # Step 2: Normalize user vector
+            seen = u_vec != 0
+            if not seen.any():
+                pop = self.R_csr.sum(0).A1
+                idx = np.argsort(pop)[::-1][:top_n]
+                return (idx + 1).tolist()
+
+            mu = np.mean(u_vec[seen])
+            u_vec[seen] -= mu
+
+            # Step 3: Predict scores via dot with Rd
+            sim_scores = self.Rd.dot(u_vec)
+            den = np.linalg.norm(sim_scores) + 1e-9
+            preds = self.mu + sim_scores / den
+            preds[seen] = -np.inf
+
+            top_idx = np.argpartition(preds, -top_n)[-top_n:]
+            top_idx = top_idx[np.argsort(preds[top_idx])[::-1]]
+            return (top_idx + 1).tolist()
+
+        # Existing user — normal path
         u_vec = self.Rd[u, :].toarray().ravel()
         seen = u_vec != 0
 
@@ -51,6 +90,7 @@ class UserBasedCFOptimized:
         top_idx = np.argpartition(preds, -top_n)[-top_n:]
         top_idx = top_idx[np.argsort(preds[top_idx])[::-1]]
         return (top_idx + 1).tolist()
+
     
 _model = None
 

@@ -38,7 +38,7 @@ async def recommend_books(user_id: int) -> List[int]:
       from two-tower and collaborative models (placeholders for now).
     """
     ratings_count, wishlist_count = await get_user_activity_counts_async(user_id)
-    if ratings_count < 5 or wishlist_count < 5:
+    if ratings_count < 3:
         # query the database for user genres by query genre_ids INTEGER[] from app.users and map them to tag names in app.tags
         conn = psycopg2.connect(DB_URL)
         try:
@@ -71,6 +71,6 @@ async def cold_start_recommendation(user_id: int, user_genres: Optional[str] = N
     """
     if not user_genres:
         return [1, 2, 3, 4, 5]
-    recommended_books = cold_start.recommend_book_ids_by_genres(user_genres, top_n=10)
+    recommended_books = cold_start.recommend_book_ids_by_genres(user_genres, top_n=100)
     return recommended_books
 

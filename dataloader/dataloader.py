@@ -192,9 +192,10 @@ def load_csv_data(conn, path, table, transform_fn, conflict_keys):
         execute_values(cur, sql, rows)
     conn.commit()
 
-def create_missing_users(conn, user_ids):
+def create_missing_users(conn, user_ids, user_rating_counts):
     if not user_ids:
         return
+
     with conn.cursor() as cur:
         cur.execute("SELECT id FROM app.users WHERE id = ANY(%s);", (list(user_ids),))
         existing_ids = {row[0] for row in cur.fetchall()}
@@ -204,17 +205,20 @@ def create_missing_users(conn, user_ids):
         return
 
     salt = bcrypt.gensalt(rounds=8)
-    to_insert = [
-        (uid, f"user_{uid}", bcrypt.hashpw(f"user_{uid}".encode('utf-8'), salt).decode('utf-8'), "user")
-        for uid in tqdm(missing, desc="Creating missing users", unit="user")
-    ]
+    to_insert = []
+    for uid in tqdm(missing, desc="Creating missing users", unit="user"):
+        username = f"user_{uid}"
+        password = bcrypt.hashpw(username.encode('utf-8'), salt).decode('utf-8')
+        selected_genre = user_rating_counts.get(uid, 0) >= 3
+        to_insert.append((uid, username, password, "user", selected_genre))
 
     with conn.cursor() as cur:
         execute_values(cur, """
-            INSERT INTO app.users (id, username, password, permission)
+            INSERT INTO app.users (id, username, password, permission, selected_genre)
             VALUES %s
             ON CONFLICT (id) DO NOTHING;
         """, to_insert)
+
     conn.commit()
 
 # ========================================
@@ -259,16 +263,22 @@ def main():
         ), "book_id, tag_id")
 
         Rating = namedtuple("Rating", ["user_id", "book_id", "rating"])
+        user_ids = set()
+        user_rating_counts = {}
+
         with open("data/ratings.csv", "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             ratings = []
-            user_ids = set()
             for row in tqdm(reader, desc="Loading ratings", unit="row"):
                 uid = int(row["user_id"])
                 bid = int(row["book_id"])
+                rating = int(row["rating"])
                 user_ids.add(uid)
-                ratings.append((uid, bid, int(row["rating"])))
-        create_missing_users(conn, user_ids)
+                user_rating_counts[uid] = user_rating_counts.get(uid, 0) + 1
+                ratings.append((uid, bid, rating))
+
+        create_missing_users(conn, user_ids, user_rating_counts)
+
         with conn.cursor() as cur:
             execute_values(cur, """
                 INSERT INTO app.ratings (user_id, book_id, rating)
@@ -286,7 +296,7 @@ def main():
                 uid = int(row["user_id"])
                 user_ids.add(uid)
                 to_read.append((uid, int(row["book_id"])))
-        create_missing_users(conn, user_ids)
+        create_missing_users(conn, user_ids, user_rating_counts)
         with conn.cursor() as cur:
             execute_values(cur, """
                 INSERT INTO app.to_read (user_id, book_id)

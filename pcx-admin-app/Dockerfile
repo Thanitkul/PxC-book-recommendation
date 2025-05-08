@@ -1,22 +1,21 @@
-FROM ubuntu:latest
+# Use official Node.js image
+FROM node:18-alpine
 
-RUN apt-get update && \
-    apt-get install -y curl gnupg build-essential && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get update && \
-    apt-get install -y nodejs && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN npm install -g @angular/cli
-
+# Set working directory
 WORKDIR /app
 
-COPY . .
+# Install Angular CLI globally
+RUN npm install -g @angular/cli
 
+# Copy package files and install dependencies
+COPY package*.json ./
 RUN npm install
 
+# Copy the rest of the application code
+COPY . .
+
+# Expose application port
 EXPOSE 4200
 
+# Start the Angular application
 CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200", "--open", "--ssl", "true"]
