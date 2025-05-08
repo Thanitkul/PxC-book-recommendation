@@ -296,7 +296,7 @@ def main():
                 uid = int(row["user_id"])
                 user_ids.add(uid)
                 to_read.append((uid, int(row["book_id"])))
-        create_missing_users(conn, user_ids)
+        create_missing_users(conn, user_ids, user_rating_counts)
         with conn.cursor() as cur:
             execute_values(cur, """
                 INSERT INTO app.to_read (user_id, book_id)
