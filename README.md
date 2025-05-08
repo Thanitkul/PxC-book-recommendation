@@ -1,4 +1,3 @@
-
 # PxC Book Recommendation System 📚
 
 An end-to-end, modular recommendation system for books, combining:
@@ -20,37 +19,30 @@ Supports secure REST API access (HTTPS) and Angular frontend clients for both us
 
 ---
 
-
 ## 🚀 How to Run
 
 > ⚠️ Requires: Docker + Docker Compose
 
-1. **Add model checkpoint**  
-   Place your trained model at:
+1. **Ensure model checkpoint exists**  
+   Before running, make sure the trained model file is available at:
 ```
 
 recsys\_server/recsys/models/two\_tower\_pointwise\_bce\_prefilter\_80.pt
 
 ````
 
-2. **Build & launch everything**  
+2. **Build & launch all services**  
 From the root directory:
 ```bash
 docker compose up --build
 ````
 
-3. **Run dataloader** *(once, manually)*
-   After all services are up:
-
-   ```bash
-   docker compose run --rm dataloader
-   ```
-
-4. **Visit the apps**
+3. **Visit the apps**
 
    * User app: [http://localhost:4201](http://localhost:4201)
    * Admin app: [http://localhost:4200](http://localhost:4200)
-   * API: [http://localhost:8080](http://localhost:8080) (HTTP) or [https://localhost:8443](https://localhost:8443) (HTTPS)
+   * API: [http://localhost:8080](http://localhost:8080) (HTTP)
+     or [https://localhost:8443](https://localhost:8443) (HTTPS)
 
 ---
 
@@ -81,6 +73,7 @@ Response:
 ["book_id_1", "book_id_2", ...]
 ```
 
+---
 
 ## 👨‍🏫 Project Notes
 
