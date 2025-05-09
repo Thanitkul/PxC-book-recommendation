@@ -61,7 +61,7 @@ async def recommend_books(user_id: int) -> List[int]:
         collab_results = await asyncio.to_thread(recommend_collaborative, user_id)
         # Combine the results (here we concatenate and remove duplicates)
         # Total 100 books: 70 from two-tower, 30 from CF, exclude seen
-        combined = list(dict.fromkeys(two_tower_results + collab_results))[:100]
+        combined = list(dict.fromkeys(two_tower_results))[:100]
         return combined
 
 async def cold_start_recommendation(user_id: int, user_genres: Optional[str] = None) -> List[int]:
