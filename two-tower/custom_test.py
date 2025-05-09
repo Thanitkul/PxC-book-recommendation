@@ -22,7 +22,7 @@ from tqdm import tqdm
 
 # ─── CONFIG ──────────────────────────────────────────────────────────
 DATA_ROOT    = "../data-prep-EDA/clean"
-CKPT_PATH    = "two_tower_pointwise_bce.pt"
+CKPT_PATH    = "two_tower_pointwise_bce2.pt"
 DEVICE       = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 TOP_K        = 10_000
 BATCH_SIZE   = 8192
@@ -291,9 +291,9 @@ if __name__ == "__main__":
 
     # Example user (replace with real IDs)
     user_id        = 125
-    # rated_books    = [(497, 5.0), (720, 4.0), (803, 5.0)]
-    # wishlist_books = [5523, 3499, 1684]
-    rated_books = [(1, 5.0), (25, 4.5), (9949, 5.0)]   # 🔧 Customize
-    wishlist_books = [28, 17]
+    rated_books    = [(497, 5.0), (720, 4.0), (803, 5.0)]
+    wishlist_books = [5523, 3499, 1684]
+    # rated_books = [(1, 5.0), (25, 4.5), (9949, 5.0)]   # 🔧 Customize
+    # wishlist_books = [28, 17]
 
     single_user_inference(user_id, rated_books, wishlist_books, art)

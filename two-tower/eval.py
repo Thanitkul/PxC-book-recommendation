@@ -23,7 +23,7 @@ from tqdm import tqdm
 
 # ─── CONFIG ──────────────────────────────────────────────────────────
 DATA_ROOT       = "../data-prep-EDA/clean"
-CKPT_PATH       = "two_tower_pointwise_bce.pt"
+CKPT_PATH       = "two_tower_pointwise_bce2.pt"
 TRAIN_WISH      = os.path.join(DATA_ROOT, "to_read_train.csv")
 TEST_WISHLIST   = os.path.join(DATA_ROOT, "to_read_test.csv")
 DEVICE          = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
